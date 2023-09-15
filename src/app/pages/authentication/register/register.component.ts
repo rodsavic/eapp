@@ -18,7 +18,10 @@ export class AppSideRegisterComponent {
   };
   //registerForm: FormGroup;
 
-  constructor(private formBuilder: FormBuilder,private router: Router,private userService: UserService, private snack:MatSnackBar,) { }
+  constructor(private formBuilder: FormBuilder,
+    private router: Router,
+    private userService: UserService, 
+    private snack:MatSnackBar,) { }
   ngOnInit(): void {
   }
   formSubmit() {

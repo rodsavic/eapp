@@ -1,0 +1,27 @@
+<div class="main-content">
+<mat-card class="cardWithShadow">
+    <mat-card-content>
+      <mat-card-title>New Word</mat-card-title>
+      <mat-card-subtitle class="mat-body-1"></mat-card-subtitle>
+    </mat-card-content>
+  
+    <form (ngSubmit)="onSubmit()">
+      <mat-form-field>
+        <input matInput [(ngModel)]="data.contenido" name="contenido" placeholder="Palabra">
+      </mat-form-field>
+      
+      <mat-form-field>
+        <input matInput [(ngModel)]="data.dificultad" name="dificultad" placeholder="Dificultad">
+      </mat-form-field>
+      
+      <mat-checkbox [(ngModel)]="data.aprendido" name="aprendido">Learned</mat-checkbox>
+  
+      <button mat-raised-button color="primary" type="submit">Guardar</button>
+      <button mat-button color="warn" (click)="onNoClick()">Cancelar</button>
+    </form>
+  </mat-card>
+</div>
+  
+
+
+  

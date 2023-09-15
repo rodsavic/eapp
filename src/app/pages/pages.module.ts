@@ -10,16 +10,24 @@ import { TablerIconsModule } from 'angular-tabler-icons';
 import * as TablerIcons from 'angular-tabler-icons/icons';
 import { AppDashboardComponent } from './dashboard/dashboard.component';
 import { HomeComponent } from './home/home.component';
+import { WordComponent } from './word/word.component';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @NgModule({
-  declarations: [AppDashboardComponent, HomeComponent],
+  declarations: [AppDashboardComponent, HomeComponent,WordComponent],
   imports: [
     CommonModule,
     MaterialModule,
     FormsModule,
     NgApexchartsModule,
+    MatSelectModule,
     RouterModule.forChild(PagesRoutes),
     TablerIconsModule.pick(TablerIcons),
+    MatDatepickerModule,
+    MatNativeDateModule,
+    
   ],
   exports: [TablerIconsModule],
 })
