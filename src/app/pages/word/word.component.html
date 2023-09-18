@@ -19,7 +19,7 @@
                         <mat-card class="b-1 shadow-none">
                             <mat-form-field appearance="outline" class="w-100" color="primary">
                                 <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Word</mat-label>
-                                <input type="text" name="word" matInput placeholder="Search a word">
+                                <input type="text" name="word" matInput placeholder="Search a word" >
                             </mat-form-field>
                         </mat-card>
                     </div>
@@ -29,12 +29,11 @@
                                 <mat-label
                                     class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block text-center">Level</mat-label>
 
-                                <mat-select>
-                                    <mat-option *ngFor="let dificultad of dificultadOptions" [value]="dificultad">
-                                        {{dificultad}}
-                                    </mat-option>
+                                <mat-select [(ngModel)]="filter.level">
+                                  <mat-option *ngFor="let dificultad of dificultadOptions" [value]="dificultad">
+                                    {{dificultad}}
+                                  </mat-option>
                                 </mat-select>
-
                             </mat-form-field>
                         </mat-card>
                     </div>
@@ -105,7 +104,7 @@
                     </thead>
                     <tbody>
 
-                        <tr *ngFor="let word of words">
+                        <tr *ngFor="let word of displayedWords">
 
                             <td class="mat-body-1 text-center">{{ word.idPalabraFrase }}</td>
 
@@ -135,11 +134,12 @@
 
                     </tbody>
                 </table>
+                <mat-paginator [length]="length" [pageIndex]="pageIndex" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
+                (page)="onPageChange($event)" class="m-t-16"></mat-paginator>
             </div>
         </mat-card-content>
     </mat-card>
-    <mat-paginator [length]="words.length" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
-        (page)="onPageChange($event)" class="m-t-16"></mat-paginator>
+   
 </div>
 
 <!--
