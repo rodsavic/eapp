@@ -1,0 +1,75 @@
+<div class="main-content">
+    <mat-card class="cardWithShadow">
+        <mat-card-content>
+            <mat-card-title>New Word</mat-card-title>
+            <mat-card-subtitle class="mat-body-1"></mat-card-subtitle>
+        
+
+        <form (ngSubmit)="formSubmit()" [formGroup]="form">
+            <div class="row">
+                <div class="col-lg-4">
+                    <mat-form-field>
+                        <input matInput formControlName="contenido" name="contenido" placeholder="Palabra">
+                    </mat-form-field>
+                </div>
+                <div class="col-lg-4">
+                    <mat-form-field>
+                        <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block text-center">Level</mat-label>
+
+                        <mat-select formControlName="dificultad" name="dificultad">
+                            <mat-option *ngFor="let dificultad of dificultadOptions" [value]="dificultad">
+                                {{dificultad}}
+                            </mat-option>
+                        </mat-select>
+
+                    </mat-form-field>
+                </div>
+                <div class="col-lg-4">
+                    <mat-checkbox formControlName="aprendido" name="aprendido">Learned</mat-checkbox>
+                </div>
+            </div>
+            <mat-card-title>Meaning</mat-card-title>
+            <div class="row">
+
+                <div class="col-lg-6">
+                    <mat-form-field>
+                        <input matInput formControlName="significado" placeholder="Meaning">
+                    </mat-form-field>
+                    <button mat-mini-fab color="accent" type="button" aria-label="Add Significado"
+                        (click)="addSignificado()">
+                        <mat-icon>plus_one</mat-icon>
+                    </button>
+                </div>
+
+
+
+                <!-- Tabla para mostrar los significados registrados -->
+                <div *ngIf="significados.length > 0" class="table-responsive col-lg-4">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class="f-w-600 mat-subtitle-1 f-s-14"></th>
+                                <th class="f-w-600 mat-subtitle-1 f-s-14">Meaning</th>
+                                <th class="f-w-600 mat-subtitle-1 f-s-14"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let significado of significados; let i = index">
+                                <td class="mat-body-1 text-center">{{ i + 1 }}</td>
+                                <td class="mat-body-1 text-center">{{ significado }}</td>
+                                <td class="mat-body-1 text-center">
+                                    <button mat-icon-button color="warn" (click)="removeSignificado(i)">
+                                        <mat-icon>delete</mat-icon>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <button mat-flat-button color="primary" class="m-t-16" type="submit">Guardar</button>
+            <button mat-flat-button color="warn" class="m-t-16 m-l-16" type="button" (click)="cancelar()">Cancelar</button>
+        </form>
+    </mat-card-content>
+    </mat-card>
+</div>
