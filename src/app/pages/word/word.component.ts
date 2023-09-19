@@ -15,7 +15,8 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { WordCreateComponent } from './word-create/word-create.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { format, parse } from 'date-fns';
+import { format, parse, isDate, isValid } from 'date-fns';
+import { WordUpdateComponent } from './word-update/word-update.component';
 
 export interface DialogData {
   contenido: string;
@@ -30,15 +31,16 @@ export interface DialogData {
   //styleUrls: ['./word.component.css']
 })
 export class WordComponent implements OnInit {
-  private backendUrl = 'http://localhost:8081';
+  //private backendUrl = 'http://localhost:8081';
 
-  words: any[];
+  words: any[] = [];
   data: DialogData = {
     contenido: '',
     dificultad: '',
     aprendido: false,
     idTipo: 1,
-  }
+  };
+
   filter: any = {
     word: '',
     level: '',
@@ -46,79 +48,67 @@ export class WordComponent implements OnInit {
     startDate: null,
     endDate: null,
   };
-  //dificultadControl = new FormControl<WordComponent | null>(null, Validators.required);
-  //selectFormControl = new FormControl('', Validators.required);
+
   dificultadOptions: string[] = ['Easy', 'Medium', 'Hard'];
   estadoOptions: string[] = ['Yes', 'No'];
+  selectedWord: any;
 
   length = 100;
-  pageSize = 5; // Cantidad de elementos por página
-  pageSizeOptions: number[] = [5, 10, 25, 100]; // Opciones de cantidad de elementos por página
-  currentPage = 0; // Página actual
+  pageSize = 5;
+  pageSizeOptions: number[] = [5, 10, 25, 100];
+  currentPage = 0;
   pageIndex: any;
   countG = 5;
   pageG = 0;
   displayedWords: any[] = [];
 
-
-  constructor(private http: HttpClient,
+  constructor(
+    private http: HttpClient,
     public dialog: MatDialog,
     private palabraService: PalabraService,
-    private snack: MatSnackBar) { }
+    private snack: MatSnackBar
+  ) { }
 
   ngOnInit(): void {
-    this.loadInitialWords();
+    this.getInitialWords();
   }
-  /*
-  getWords(): Observable<any[]> {
-    return this.http.get(`${this.backendUrl}/palabrafrases`)
-      .pipe(map(response => {
-        if (response) {
-          return Object.values(response);
-        }
-        return [];
-      }));
-  }
-  */
-  /*
-  getWords(): Observable<any[]> {
-    return this.http.get(`${this.backendUrl}/palabrafrases`)
-      .pipe(map(response => {
-        if (response) {
-          this.words = Object.values(response);
-        } else {
-          this.words = [];
-        }
-        return this.words; // Importante devolver las palabras actualizadas
-      }));
-  }
-  */
-  getWords() {
-    // Construye la URL de la solicitud HTTP con los valores de los filtros
-  const url = `${this.backendUrl}/palabrafrases/buscar`;
- 
-  const params = {
-    contenido: this.filter.word,
-    dificultad: this.filter.level,
-    aprendido: this.filter.learned,
-    fechaInicio: format(this.filter.startDate, 'yyyy-MM-dd'),
-    fechaFin: format(this.filter.endDate, 'yyyy-MM-dd')
-  };
 
-  return this.http.get(url, { params })
-    .pipe(map(response => {
-      if (response) {
-        this.words = Object.values(response);
-      } else {
-        this.words = [];
-      }
-      return this.words;
-    }));
+  getInitialWords() {
+    this.palabraService.getPalabra().subscribe((words: any[]) => {
+      this.words = words;
+      // Muestra las palabras sin filtros en la página actual
+      this.displayedWords = this.words.slice(0, this.pageSize);
+    });
   }
+  /*
+  searchWords() {
+    const url = `${this.backendUrl}/palabrafrases/buscar`;
+    
+    const params: any = {
+      contenido: this.filter.word,
+      dificultad: this.filter.level,
+      aprendido: this.filter.learned
+    };
   
-
-
-  openDialog(): void {
+    // Verifica si startDate es una fecha válida antes de formatearla
+    if (isDate(this.filter.startDate) && isValid(this.filter.startDate)) {
+      params.fechaInicio = format(this.filter.startDate, 'yyyy-MM-dd');
+    }
+    
+    // Verifica si endDate es una fecha válida antes de formatearla
+    if (isDate(this.filter.endDate) && isValid(this.filter.endDate)) {
+      params.fechaFin = format(this.filter.endDate, 'yyyy-MM-dd');
+    }
+  
+    return this.http.get(url, { params }).pipe(
+      map((response: any) => {
+        this.words = response ? Object.values(response) : [];
+        return this.words;
+      })
+    );
+  }
+  */
+  openWordCreateDialog(): void {
     const dialogRef = this.dialog.open(WordCreateComponent, {
       width: '75%',
       height: '75%',
@@ -130,40 +120,41 @@ export class WordComponent implements OnInit {
     });
   }
 
-  // Método para manejar los cambios de página
-  onPageChange($event: any) {
-    /*
-    this.countG = $event.pageSize;
-    this.pageG = $event.pageIndex  * $event.pageSize;
-    this.getWords();
-    */
-    // Actualiza la página actual y la cantidad de elementos por página
-    this.pageSize = $event.pageSize;
-    this.currentPage = $event.pageIndex;
+  // Función para abrir el diálogo de actualización de palabra
+  openWordUpdateDialog(word: any): void {
+    this.selectedWord = word; // Almacena la palabra seleccionada en la variable
+    const dialogRef = this.dialog.open(WordUpdateComponent, {
+      width: '75%',
+      height: '75%',
+      data: this.selectedWord // Pasa la palabra seleccionada al diálogo
+    });
 
-    // Calcula la posición inicial de la página actual
-    const startIndex = this.currentPage * this.pageSize;
-
-    // Filtra las palabras para mostrar solo las de la página actual
-    this.displayedWords = this.words.slice(startIndex, startIndex + this.pageSize);
-  }
-
-  loadInitialWords() {
-    this.getWords().subscribe(() => {
-      // Filtra las palabras para mostrar solo las de la página actual
-      this.displayedWords = this.words.slice(0, this.pageSize);
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('Edit dialog was closed', result);
     });
   }
+
+  onPageChange($event: any) {
+    this.pageSize = $event.pageSize;
+    this.currentPage = $event.pageIndex;
+    const startIndex = this.currentPage * this.pageSize;
+    this.displayedWords = this.words.slice(startIndex, startIndex + this.pageSize);
+  }
   /*
-  onSubmit() {
-    this.getWords();
+  loadInitialWords() {
+    this.getWords().subscribe(() => {
+      this.displayedWords = this.words.slice(0, this.pageSize);
+    });
   }
   */
   onSubmit() {
-    this.getWords().subscribe(() => {
-      // Filtra las palabras para mostrar solo las de la página actual
+    // Realiza la búsqueda con los filtros y actualiza las palabras mostradas
+    this.palabraService.filtrarPalabra(this.filter).subscribe((words: any[]) => {
+      this.words = words;
+      // Restablece la página actual al 0 cuando se aplican los filtros
+      this.currentPage = 0;
+      // Muestra las palabras filtradas en la página actual
       this.displayedWords = this.words.slice(0, this.pageSize);
     });
   }
-  
 }

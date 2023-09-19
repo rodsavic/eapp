@@ -16,6 +16,12 @@ export class SignificadoService {
     const url = `${this.backendUrl}/significados`;
     return this.http.post(url, data);
   }
+
+  getSignificadosByPalabraId(idPalabraFrase: number): Observable<any> {
+    const url = `${this.backendUrl}/significados/${idPalabraFrase}`;
+    return this.http.get(url);
+  }
+
   /*
   // Método para obtener el ID de una palabra o frase por su contenido
   getPalabraFraseIdByContenido(contenido: string): Observable<number> {

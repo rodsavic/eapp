@@ -17,9 +17,10 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { WordCreateComponent } from './word/word-create/word-create.component';
 import { MeaningComponent } from './word/meaning/meaning.component';
 import format from 'date-fns/format';
+import { WordUpdateComponent } from './word/word-update/word-update.component';
 
 @NgModule({
-  declarations: [AppDashboardComponent, HomeComponent,WordComponent, WordCreateComponent, MeaningComponent],
+  declarations: [AppDashboardComponent, HomeComponent,WordComponent, WordCreateComponent, MeaningComponent, WordUpdateComponent],
   imports: [
     CommonModule,
     MaterialModule,

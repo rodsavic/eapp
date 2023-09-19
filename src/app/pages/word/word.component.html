@@ -5,11 +5,11 @@
             <mat-card-subtitle class="mat-body-1"></mat-card-subtitle>
         </mat-card-content>
     </mat-card>
-    <button (click)="openDialog()" mat-flat-button color="primary" class="m-t-8 m-b-8">
+    <button (click)="openWordCreateDialog()" mat-flat-button color="primary" class="m-t-8 m-b-8">
         New Word
     </button>
     <!--FILTRO-->
-    <form>
+    <form (ngSubmit)="onSubmit()">
 
         <mat-card class="cardWithShadow">
             <mat-card-subtitle class="mat-body-1 m-t-8 m-l-16">Filter</mat-card-subtitle>
@@ -19,7 +19,7 @@
                         <mat-card class="b-1 shadow-none">
                             <mat-form-field appearance="outline" class="w-100" color="primary">
                                 <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Word</mat-label>
-                                <input type="text" name="word" matInput placeholder="Search a word" >
+                                <input type="text" name="word" matInput placeholder="Search a word" [(ngModel)]="filter.word" [ngModelOptions]="{ standalone: true }">
                             </mat-form-field>
                         </mat-card>
                     </div>
@@ -29,7 +29,7 @@
                                 <mat-label
                                     class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block text-center">Level</mat-label>
 
-                                <mat-select [(ngModel)]="filter.level">
+                                <mat-select [(ngModel)]="filter.level" [ngModelOptions]="{standalone: true}">
                                   <mat-option *ngFor="let dificultad of dificultadOptions" [value]="dificultad">
                                     {{dificultad}}
                                   </mat-option>
@@ -119,7 +119,7 @@
                             <td class="mat-body-1 text-center">{{ word.fechaRegistro | date:'dd-MM-yyyy'}}</td>
 
                             <td class="mat-body-1 text-center">
-                                <button mat-flat-button color="accent" class="m-t-8 text-center">Editar
+                                <button (click)="openWordUpdateDialog(word)" mat-flat-button color="accent" class="m-t-8 text-center">Editar
                                     <mat-icon aria-hidden="false" aria-label="Edit icon">edit</mat-icon>
 
                                 </button>
@@ -134,7 +134,7 @@
 
                     </tbody>
                 </table>
-                <mat-paginator [length]="length" [pageIndex]="pageIndex" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
+                <mat-paginator [length]="words.length" [pageIndex]="pageIndex" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
                 (page)="onPageChange($event)" class="m-t-16"></mat-paginator>
             </div>
         </mat-card-content>
