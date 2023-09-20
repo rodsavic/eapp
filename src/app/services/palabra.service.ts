@@ -17,6 +17,19 @@ export class PalabraService {
     return this.http.post(url, data);
   }
 
+  // Metodo para actualizar palabra
+  updatePalabra(id: number, data: any): Observable<any> {
+    const url = `${this.backendUrl}/${id}`;
+    return this.http.put(url, data);
+  }
+
+  //Metodo para eliminar palabra
+  eliminarPalabra(id: number): Observable<any> {
+    const url = `${this.backendUrl}/${id}`;
+    return this.http.delete(url);
+  }
+
+
   getPalabra(): Observable<any> {
     const url = `${this.backendUrl}/`;
 

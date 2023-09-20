@@ -2,31 +2,103 @@
     <mat-card class="cardWithShadow">
         <mat-card-content>
             <mat-card-title>Edit Word</mat-card-title>
-        <form [formGroup]="updateForm" (ngSubmit)="formSubmit()">
-            <div class="row">
-                <div class="col-lg-4">
-                    <mat-form-field>
-                        <input matInput formControlName="contenido" name="contenido" placeholder="Palabra">
-                    </mat-form-field>
+            <form [formGroup]="updateForm" (ngSubmit)="formSubmit()">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <mat-form-field>
+                            <input matInput formControlName="contenido" name="contenido" placeholder="Palabra">
+                        </mat-form-field>
+                    </div>
+                    <div class="col-lg-4">
+                        <mat-form-field>
+                            <mat-label
+                                class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block text-center">Level</mat-label>
+                            <mat-select formControlName="dificultad" name="dificultad">
+                                <mat-option *ngFor="let dificultad of dificultadOptions" [value]="dificultad">
+                                    {{ dificultad }}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-lg-4">
+                        <mat-checkbox formControlName="aprendido" name="aprendido">Learned</mat-checkbox>
+                    </div>
                 </div>
-                <div class="col-lg-4">
-                    <mat-form-field>
-                        <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block text-center">Level</mat-label>
-                        <mat-select formControlName="dificultad" name="dificultad">
-                            <mat-option *ngFor="let dificultad of dificultadOptions" [value]="dificultad">
-                                {{ dificultad }}
-                            </mat-option>
-                        </mat-select>
-                    </mat-form-field>
+                <mat-card-title>Meaning</mat-card-title>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <mat-form-field>
+                            <input matInput formControlName="significado" name="significado" placeholder="Meaning">
+                        </mat-form-field>
+                        <button mat-mini-fab color="accent" type="button" aria-label="Add Significado"
+                            (click)="addSignificado()">
+                            <mat-icon>plus_one</mat-icon>
+                        </button>
+                    </div>
+                    <!-- Tabla para mostrar los significados registrados -->
+                    <div *ngIf="significadosNuevos.length > 0" class="table-responsive col-lg-4">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th class="f-w-600 mat-subtitle-1 f-s-14"></th>
+                                    <th class="f-w-600 mat-subtitle-1 f-s-14">New Meanings</th>
+                                    <th class="f-w-600 mat-subtitle-1 f-s-14"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let significado of significadosNuevos; let i = index">
+                                    <td class="mat-body-1 text-center">{{ i + 1 }}</td>
+                                    <td class="mat-body-1 text-center">{{ significado }}</td>
+                                    <td class="mat-body-1 text-center">
+                                        <button mat-icon-button color="warn" (click)="removeSignificadoNuevo(i)">
+                                            <mat-icon>delete</mat-icon>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="col-lg-4">
-                    <mat-checkbox formControlName="aprendido" name="aprendido">Learned</mat-checkbox>
-                </div>
-            </div>
-            <button mat-flat-button color="primary" class="m-t-16" type="submit">Guardar</button>
+                <!-- Cierre del formulario principal -->
+
+
+                <!-- Formulario para mostrar y agregar significados -->
+                <form [formGroup]="significadosForm">
+                    <div class="row">
+                        <!-- Tabla para mostrar los significados registrados -->
+                        <div *ngIf="significadosObtenidos.length > 0" class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th class="f-w-600 mat-subtitle-1 f-s-14"></th>
+                                        <th class="f-w-600 mat-subtitle-1 f-s-14">Registered Meanings </th>
+                                        <th class="f-w-600 mat-subtitle-1 f-s-14"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let significado of significadosMap | keyvalue; let i = index">
+                                        <td class="mat-body-1 text-center">{{ i + 1 }}</td>
+                                        <td class="mat-body-1 text-center">{{ significado.value }}</td>
+                                        <td class="mat-body-1 text-center">
+                                            <button mat-icon-button color="warn"
+                                                (click)="removeSignificado(significado.key, i)">
+                                                <mat-icon>delete</mat-icon>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </form>
+                <!-- Cierre del formulario de significados -->
+
+                <!-- Botones de acción -->
+                <button mat-flat-button color="primary" class="m-t-16" type="submit">Guardar</button>
                 <button mat-flat-button color="warn" class="m-t-16 m-l-16" type="button"
                     (click)="cancelar()">Cancelar</button>
-        </form>
-    </mat-card-content>
+            </form>
+
+        </mat-card-content>
     </mat-card>
 </div>

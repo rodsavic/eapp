@@ -17,6 +17,7 @@ import { WordCreateComponent } from './word-create/word-create.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { format, parse, isDate, isValid } from 'date-fns';
 import { WordUpdateComponent } from './word-update/word-update.component';
+import { SignificadoService } from 'src/app/services/significado.service';
 
 export interface DialogData {
   contenido: string;
@@ -52,6 +53,7 @@ export class WordComponent implements OnInit {
   dificultadOptions: string[] = ['Easy', 'Medium', 'Hard'];
   estadoOptions: string[] = ['Yes', 'No'];
   selectedWord: any;
+  significadosIds: any;
 
   length = 100;
   pageSize = 5;
@@ -66,7 +68,8 @@ export class WordComponent implements OnInit {
     private http: HttpClient,
     public dialog: MatDialog,
     private palabraService: PalabraService,
-    private snack: MatSnackBar
+    private snack: MatSnackBar,
+    private significadoService: SignificadoService
   ) { }
 
   ngOnInit(): void {
@@ -80,34 +83,40 @@ export class WordComponent implements OnInit {
       this.displayedWords = this.words.slice(0, this.pageSize);
     });
   }
-  /*
-  searchWords() {
-    const url = `${this.backendUrl}/palabrafrases/buscar`;
-    
-    const params: any = {
-      contenido: this.filter.word,
-      dificultad: this.filter.level,
-      aprendido: this.filter.learned
-    };
+
+  deleteWord(word: any): void {
+    // Obtén el ID de la palabra seleccionada
+    const palabraId = word.idPalabraFrase;
   
-    // Verifica si startDate es una fecha válida antes de formatearla
-    if (isDate(this.filter.startDate) && isValid(this.filter.startDate)) {
-      params.fechaInicio = format(this.filter.startDate, 'yyyy-MM-dd');
-    }
-    
-    // Verifica si endDate es una fecha válida antes de formatearla
-    if (isDate(this.filter.endDate) && isValid(this.filter.endDate)) {
-      params.fechaFin = format(this.filter.endDate, 'yyyy-MM-dd');
-    }
+    this.significadoService.getSignificadosByPalabraId(palabraId)
+      .subscribe((significados: any[]) => {
+        // Extrae los IDs de significados y almacénalos en un arreglo
+        const significadoIds = significados.map(significado => significado.idSignificado);
+        console.log("Ids de significados obtenidos:", significadoIds);
   
-    return this.http.get(url, { params }).pipe(
-      map((response: any) => {
-        this.words = response ? Object.values(response) : [];
-        return this.words;
-      })
-    );
+        // Verifica si hay significados antes de eliminar
+        if (significadoIds.length > 0) {
+          // Itera sobre los IDs de significados y elimina cada uno
+          for (const id of significadoIds) {
+            this.significadoService.eliminarSignificado(id).subscribe(() => {
+              console.log("Significado eliminado correctamente");
+            });
+          }
+        }
+  
+        // Una vez eliminados los significados (o si no había ninguno), elimina la palabra
+        this.palabraService.eliminarPalabra(palabraId).subscribe(() => {
+          // Actualiza la lista de palabras después de eliminar
+          this.getInitialWords();
+          // O muestra un mensaje de éxito
+          this.snack.open('Palabra eliminada correctamente', 'Cerrar', {
+            duration: 3000,
+          });
+        });
+      });
   }
-  */
+
+  // Función para abrir el diálogo de creacion de palabra
   openWordCreateDialog(): void {
     const dialogRef = this.dialog.open(WordCreateComponent, {
       width: '75%',
@@ -140,13 +149,7 @@ export class WordComponent implements OnInit {
     const startIndex = this.currentPage * this.pageSize;
     this.displayedWords = this.words.slice(startIndex, startIndex + this.pageSize);
   }
-  /*
-  loadInitialWords() {
-    this.getWords().subscribe(() => {
-      this.displayedWords = this.words.slice(0, this.pageSize);
-    });
-  }
-  */
+  
   onSubmit() {
     // Realiza la búsqueda con los filtros y actualiza las palabras mostradas
     this.palabraService.filtrarPalabra(this.filter).subscribe((words: any[]) => {
