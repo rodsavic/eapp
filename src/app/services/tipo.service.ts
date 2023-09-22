@@ -1,41 +1,52 @@
 import { HttpClient, HttpParams  } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
+import { Tipo } from "../models/tipo.model";
 
 @Injectable({
   providedIn: 'root'
 })
 
-export class PalabraService {
-  private backendUrl = 'http://localhost:8081/palabrafrases'; // Reemplaza con la URL de tu backend
+export class TipoService {
+  private backendUrl = 'http://localhost:8081/tipos'; // Reemplaza con la URL de tu backend
 
   constructor(private http: HttpClient) { }
 
-  // Método para registrar una palabra en el backend
-  registrarPalabra(data: any): Observable<any> {
+  // Método para registrar un tipo en el backend
+  registrarTipo(data: any): Observable<any> {
     const url = `${this.backendUrl}/`;
     return this.http.post(url, data);
   }
 
   // Metodo para actualizar palabra
-  updatePalabra(id: number, data: any): Observable<any> {
+  updateTipo(id: number, data: any): Observable<any> {
     const url = `${this.backendUrl}/${id}`;
     return this.http.put(url, data);
   }
 
   //Metodo para eliminar palabra
-  eliminarPalabra(id: number): Observable<any> {
+  eliminarTipo(id: string): Observable<any> {
     const url = `${this.backendUrl}/${id}`;
     return this.http.delete(url);
   }
 
 
-  getPalabra(): Observable<any> {
+  getTipo(): Observable<any> {
     const url = `${this.backendUrl}/`;
 
     return this.http.get(url);
   }
 
+  getTipoByCod(codTipo: string){
+    const url = `${this.backendUrl}/${codTipo}`;
+    return this.http.get(url);
+  }
+
+  getTipoPorCategoria(idCategoria: number): Observable<Tipo[]>{
+    const url = `${this.backendUrl}/categoria/${idCategoria}`;
+    return this.http.get<Tipo[]>(url);
+  }
+  /*
   filtrarPalabra(filter: any): Observable<any> {
     const url = `${this.backendUrl}/buscar`;
 
@@ -50,9 +61,6 @@ export class PalabraService {
     if (filter.learned) {
       params = params.set('aprendido', filter.learned);
     }
-    if (filter.codTipo) {
-      params = params.set('codTipo', filter.codTipo);
-    }
     if (filter.startDate) {
       params = params.set('fechaInicio', filter.startDate.toISOString());
     }
@@ -62,12 +70,13 @@ export class PalabraService {
 
     return this.http.get(url, { params });
   }
-
+  */
+ /*
   // Método para obtener el ID de una palabra o frase por su contenido
   getPalabraFraseIdByContenido(contenido: string): Observable<number> {
     const url = `${this.backendUrl}/buscarPorContenido/${contenido}`;
     return this.http.get<number>(url);
   }
-
+  */
 }
 

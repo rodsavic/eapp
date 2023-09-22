@@ -1,10 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { PalabraService } from 'src/app/services/palabra.service';
 import { DialogData } from '../word.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SignificadoService } from 'src/app/services/significado.service';
+import { TipoService } from 'src/app/services/tipo.service';
+import { Tipo } from 'src/app/models/tipo.model';
+import { TypeComponent } from '../../type/type.component';
 
 
 @Component({
@@ -18,18 +21,21 @@ export class WordCreateComponent implements OnInit {
     contenido: '',
     dificultad: '',
     aprendido: false,
-    idTipo: 1,
+    codTipo: '',
   };
 
   significado: {
     descripcion: String,
     idPalabraFrase: Number,
-  }= {
-    descripcion: '',
-    idPalabraFrase: 0,
-  };
+  } = {
+      descripcion: '',
+      idPalabraFrase: 0,
+    };
+
+  //tipo: number;
   //id_palabra: 0;
   dificultadOptions: string[] = ['Easy', 'Medium', 'Hard'];
+  tipoOptions: Tipo[];
   significados: string[] = [];
   significado_array: string[] = [];
   form: FormGroup;
@@ -39,32 +45,43 @@ export class WordCreateComponent implements OnInit {
     private dialogRef: MatDialogRef<WordCreateComponent>,
     private snack: MatSnackBar,
     private fb: FormBuilder,
-    private significadoService: SignificadoService) { }
+    private significadoService: SignificadoService,
+    private tipoService: TipoService,
+    public dialog: MatDialog,
+  ) { }
 
   ngOnInit(): void {
     // Configurar el formulario reativo
+    // Campos de entrada
     this.form = this.fb.group({
       contenido: ['', Validators.required],
       dificultad: ['', Validators.required],
       aprendido: [false],
+      codTipo: ['', Validators.required],
+      significado: [''],
 
-      significado: [''], // Campo de entrada de significado
+
     });
-    
+
+    this.form.get('tipo')?.valueChanges.subscribe(value => {
+      console.log('Tipo seleccionado:', value);
+    });
+    // Llama al método para cargar los tipos
+    this.loadTipos();
+
   }
   formSubmit() {
     const formData = {
       contenido: this.form.get('contenido')?.value || '', // Usar un valor por defecto si es nulo
       dificultad: this.form.get('dificultad')?.value || '',
       aprendido: this.form.get('aprendido')?.value || false, // Usar un valor por defecto si es nulo
-      idTipo: 1,
-     
+      codTipo: this.form.get('codTipo')?.value || '',
     };
 
-    var significado =  this.significados;
+    var significado = this.significados;
     //console.log("Significado 1: ",this.form.get('significado'))
-    console.log("Significado: ",significado)
-    console.log("formDara: ", formData);
+    console.log("Significado: ", significado)
+    console.log("formData: ", formData);
     this.palabraService.registrarPalabra(formData).subscribe(response => {
       console.log('Palabra registrada con éxito', response);
       this.dialogRef.close(response);
@@ -72,14 +89,16 @@ export class WordCreateComponent implements OnInit {
         duration: 3000
       });
 
+
+
       this.palabraService.getPalabraFraseIdByContenido(formData.contenido).subscribe(idPalabraFrase => {
         // Ahora puedes usar id_palabra para registrar los significados
         this.significado.idPalabraFrase = idPalabraFrase;
         console.log('ID de palabra obtenido:', this.significado.idPalabraFrase);
         for (const significa of significado) {
           this.significado.descripcion = significa,
-           
-          console.log("Significado: ", significa)
+
+            console.log("Significado: ", significa)
           console.log('ID :', this.significado.idPalabraFrase);
           // Utiliza el servicio para registrar el significado
           this.significadoService.registrarSignificado(this.significado).subscribe(result => {
@@ -87,24 +106,16 @@ export class WordCreateComponent implements OnInit {
           });
         }
 
-      })    
-
-
-
-      // Puedes realizar otras acciones aquí después de guardar los datos
-      //this.dialogRef.close(response); // Cierra el cuadro de diálogo y pasa la respuesta al componente padre
+      })
     });
-    /*
-    this.palabraService.getPalabraFraseIdByContenido(formData.contenido).subscribe(id_palabra => {
-      // Ahora puedes usar id_palabra para registrar los significados
-      console.log('ID de palabra obtenido:', id_palabra);
-    
-      // Registra cada significado
-      
-      //const idPalabra = response.id;
-      //console.log("idPalabra ", idPalabra)
-      // Resto del código...
-    });*/
+  }
+
+  loadTipos() {
+    this.tipoService.getTipoPorCategoria(1).subscribe((tipos: Tipo[]) => {
+      this.tipoOptions = tipos;
+    });
+    console.log('tipoOptions:', this.tipoOptions);
+
   }
 
   addSignificado() {
@@ -124,5 +135,18 @@ export class WordCreateComponent implements OnInit {
   cancelar() {
     // Cierra el diálogo sin guardar nada
     this.dialogRef.close();
+  }
+
+  // Función para abrir el diálogo de creacion de palabra
+  openTypeCreateDialog(): void {
+    const dialogRef = this.dialog.open(TypeComponent, {
+      width: '40%',
+      height: '40%',
+      data: this.data
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed', result);
+    });
   }
 }

@@ -5,6 +5,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { PalabraService } from 'src/app/services/palabra.service';
 import { SignificadoService } from 'src/app/services/significado.service';
 import { DialogData } from '../word.component';
+import { Tipo } from 'src/app/models/tipo.model';
+import { TipoService } from 'src/app/services/tipo.service';
 
 @Component({
   selector: 'app-word-update',
@@ -16,7 +18,7 @@ export class WordUpdateComponent implements OnInit {
   contenido: string;
   dificultad: string;
   aprendido: boolean;
-  idTipo: number;
+  codTipo: string;
   idPalabraFrase: number;
   updateForm: FormGroup;
   significadosForm: FormGroup; // Nuevo formulario para los significados
@@ -31,6 +33,7 @@ export class WordUpdateComponent implements OnInit {
   significadosObtenidos: any[] = []; // Inicializa con los obtenidos
   significadosNuevos: string[] = [];
   significadosMap: Map<number, string> = new Map<number, string>(); // Usar un mapa para rastrear los significados
+  tipoOptions: Tipo[];
 
   constructor(
     public dialogRef: MatDialogRef<WordUpdateComponent>,
@@ -38,7 +41,8 @@ export class WordUpdateComponent implements OnInit {
     private formBuilder: FormBuilder,
     private palabraService: PalabraService,
     private snackBar: MatSnackBar,
-    private significadoService: SignificadoService
+    private significadoService: SignificadoService,
+    private tipoService: TipoService,
   ) { }
 
   ngOnInit(): void {
@@ -46,7 +50,7 @@ export class WordUpdateComponent implements OnInit {
     this.contenido = this.data.contenido;
     this.dificultad = this.data.dificultad;
     this.aprendido = this.data.aprendido;
-    this.idTipo = this.data.idTipo;
+    this.codTipo = this.data.codTipo;
     this.idPalabraFrase = this.data.idPalabraFrase;
 
     // Inicializa el formulario reactivo
@@ -54,8 +58,9 @@ export class WordUpdateComponent implements OnInit {
       contenido: [this.contenido, Validators.required],
       dificultad: [this.dificultad, Validators.required],
       aprendido: [this.aprendido],
+      codTipo: ['', Validators.required],
       significado: []
-      // Agrega otros campos aquí si es necesario
+
     });
 
     // Inicializa el formulario para los significados
@@ -75,6 +80,9 @@ export class WordUpdateComponent implements OnInit {
         // Inicializa la lista de significados obtenidos
         this.significadosObtenidos = significados;
       });
+
+    // Llama al método para cargar los tipos
+    this.loadTipos();
   }
 
   // Método para manejar la acción de enviar el formulario principal
@@ -150,6 +158,15 @@ export class WordUpdateComponent implements OnInit {
     // Eliminar un significado por índice
     this.significadosNuevos.splice(index, 1);
   }
+
+  loadTipos() {
+    this.tipoService.getTipoPorCategoria(1).subscribe((tipos: Tipo[]) => {
+      this.tipoOptions = tipos;
+    });
+    console.log('tipoOptions:', this.tipoOptions);
+
+  }
+
   cancelar() {
     // Cierra el diálogo sin guardar nada
     this.dialogRef.close();

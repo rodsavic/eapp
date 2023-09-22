@@ -8,7 +8,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { Observable, map } from 'rxjs';
+import { Observable, forkJoin, map } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { PalabraService } from 'src/app/services/palabra.service';
 import { PageEvent } from '@angular/material/paginator';
@@ -18,12 +18,14 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { format, parse, isDate, isValid } from 'date-fns';
 import { WordUpdateComponent } from './word-update/word-update.component';
 import { SignificadoService } from 'src/app/services/significado.service';
+import { TipoService } from 'src/app/services/tipo.service';
+import { Tipo } from 'src/app/models/tipo.model';
 
 export interface DialogData {
   contenido: string;
   dificultad: string;
   aprendido: boolean;
-  idTipo: number;
+  codTipo: string;
 }
 
 @Component({
@@ -39,17 +41,20 @@ export class WordComponent implements OnInit {
     contenido: '',
     dificultad: '',
     aprendido: false,
-    idTipo: 1,
+    codTipo: '',
   };
 
   filter: any = {
     word: '',
     level: '',
     learned: '',
+    codTipo:'',
     startDate: null,
     endDate: null,
   };
 
+  tipoOptions: Tipo[];
+  displayedWordsWithTypes: any[] = [];
   dificultadOptions: string[] = ['Easy', 'Medium', 'Hard'];
   estadoOptions: string[] = ['Yes', 'No'];
   selectedWord: any;
@@ -69,20 +74,35 @@ export class WordComponent implements OnInit {
     public dialog: MatDialog,
     private palabraService: PalabraService,
     private snack: MatSnackBar,
-    private significadoService: SignificadoService
+    private significadoService: SignificadoService,
+    private tipoService: TipoService,
   ) { }
 
   ngOnInit(): void {
     this.getInitialWords();
+    this.loadTipos();
   }
 
   getInitialWords() {
     this.palabraService.getPalabra().subscribe((words: any[]) => {
       this.words = words;
-      // Muestra las palabras sin filtros en la página actual
-      this.displayedWords = this.words.slice(0, this.pageSize);
+      
+      let requests = words.map(word => {
+        return this.tipoService.getTipoByCod(word.codTipo).pipe(
+          map((tipo: any) => {
+            return { ...word, tipoDescripcion: tipo.descripcion };
+          })
+        );
+      });
+      
+      forkJoin(requests).subscribe((results: any[]) => {
+        this.displayedWordsWithTypes = results.slice(0, this.pageSize);
+      });
     });
+
+
   }
+  
 
   deleteWord(word: any): void {
     // Obtén el ID de la palabra seleccionada
@@ -126,6 +146,7 @@ export class WordComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed', result);
+      this.getInitialWords();
     });
   }
 
@@ -140,14 +161,37 @@ export class WordComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('Edit dialog was closed', result);
+      this.getInitialWords();
     });
   }
 
   onPageChange($event: any) {
     this.pageSize = $event.pageSize;
-    this.currentPage = $event.pageIndex;
-    const startIndex = this.currentPage * this.pageSize;
-    this.displayedWords = this.words.slice(startIndex, startIndex + this.pageSize);
+  this.currentPage = $event.pageIndex;
+  const startIndex = this.currentPage * this.pageSize;
+  const paginatedWords = this.words.slice(startIndex, startIndex + this.pageSize);
+  
+  // Crear peticiones para cargar los datos de "Type" para las palabras paginadas
+  let requests = paginatedWords.map(word => {
+    return this.tipoService.getTipoByCod(word.codTipo).pipe(
+      map((tipo: any) => {
+        return { ...word, tipoDescripcion: tipo.descripcion };
+      })
+    );
+  });
+
+  // Realizar las peticiones y actualizar displayedWordsWithTypes con los resultados
+  forkJoin(requests).subscribe((results: any[]) => {
+    this.displayedWordsWithTypes = results;
+  });
+  }
+
+  loadTipos() {
+    this.tipoService.getTipoPorCategoria(1).subscribe((tipos: Tipo[]) => {
+      this.tipoOptions = tipos;
+    });
+    console.log('tipoOptions:', this.tipoOptions);
+
   }
   
   onSubmit() {
@@ -157,7 +201,7 @@ export class WordComponent implements OnInit {
       // Restablece la página actual al 0 cuando se aplican los filtros
       this.currentPage = 0;
       // Muestra las palabras filtradas en la página actual
-      this.displayedWords = this.words.slice(0, this.pageSize);
+      this.displayedWordsWithTypes = this.words.slice(0, this.pageSize);
     });
   }
 }
