@@ -18,9 +18,10 @@ import { WordCreateComponent } from './word/word-create/word-create.component';
 import { MeaningComponent } from './word/meaning/meaning.component';
 import format from 'date-fns/format';
 import { WordUpdateComponent } from './word/word-update/word-update.component';
+import { TypeComponent } from './type/type.component';
 
 @NgModule({
-  declarations: [AppDashboardComponent, HomeComponent,WordComponent, WordCreateComponent, MeaningComponent, WordUpdateComponent],
+  declarations: [AppDashboardComponent, HomeComponent,WordComponent, WordCreateComponent, MeaningComponent, WordUpdateComponent, TypeComponent],
   imports: [
     CommonModule,
     MaterialModule,
