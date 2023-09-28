@@ -1,0 +1,64 @@
+<div class="main-content w-100">
+    <mat-card class="cardWithShadow">
+        <mat-card-content>
+            <mat-card-title class="text-center">{{ data.palabra }}</mat-card-title>
+        </mat-card-content>
+    </mat-card>
+    <button (click)="openSentenceCreateDialog()" mat-flat-button color="primary" class="m-t-8 m-b-8">
+        New Sentence
+    </button>
+
+    <mat-card class="cardWithShadow">
+        <mat-card-content class="p-24">
+            <mat-card-title>List of Sentences</mat-card-title>
+            <div class="table-responsive">
+                <table class="w-100">
+                    <thead>
+                        <tr>
+
+                            <th class="f-w-600 mat-subtitle-1 f-s-14">#</th>
+
+                            <th class="f-w-600 mat-subtitle-1 f-s-14">Sentence</th>
+
+                            <th class="f-w-600 mat-subtitle-1 f-s-14">Date Registered</th>
+
+                            <th class="f-w-600 mat-subtitle-1 f-s-14">Action</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr *ngFor="let sentence of sentence; let i = index">
+
+                            <td class="mat-body-1 text-center">{{  i + 1  }}</td>
+
+                            <td class="mat-body-1">{{ sentence.texto }}</td>
+
+                            <td class="mat-body-1 text-center">{{ sentence.fechaRegistro | date:'dd-MM-yyyy'}}</td>
+
+                            <td class="mat-body-1 text-center">
+                                <button mat-mini-fab color="accent" class="m-t-8 text-center">
+                                    <mat-icon aria-hidden="false" aria-label="Edit icon">edit</mat-icon>
+
+                                </button>
+                                <button (click)="deleteSentence(sentence.idOracion)" mat-mini-fab color="warn" class="m-t-8 m-l-16 text-center">
+                                    <mat-icon aria-hidden="false" aria-label="Delete icon">delete</mat-icon>
+
+
+                                </button>
+
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+                <!--
+        <mat-paginator [length]="words.length" [pageIndex]="pageIndex" [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions" (page)="onPageChange($event)" class="m-t-16">
+        </mat-paginator>
+        -->
+            </div>
+        </mat-card-content>
+    </mat-card>
+
+</div>
