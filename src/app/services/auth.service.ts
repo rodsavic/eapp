@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, Subject } from 'rxjs';
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import { Observable, Subject, map } from 'rxjs';
+import { Credentials } from '../models/credentials.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private backendUrl = 'http://localhost:8081'; // Reemplaza con la URL de tu backend
+  private backendUrl = 'http://localhost:8081';
 
   
 
@@ -14,11 +15,28 @@ export class AuthService {
 
   constructor(private http:HttpClient) { }
 
+  login(creds:Credentials){
+    return this.http.post(`${this.backendUrl}/login`,creds,{ 
+      observe: 'response'
+    }).pipe(map((response:HttpResponse<any>)=>{
+      const body = response.body;
+      const header = response.headers;
+
+      const bearerToken = header.get('Authorization')!;
+      const token = bearerToken.replace('Bearer ', '');
+
+      localStorage.setItem('token',token)
+      return body;
+    }))
+  }
+
+  
+/*
   //generamos el token
   public generateToken(userData:any){
     console.log('Ingresa a generateToKen - authService')
     return this.http.post(`${this.backendUrl}/generate-token`,userData);
-  }
+  }*/
   /*
   public getCurrentUser(){
     return this.http.get(`${this.backendUrl}/actual-usuario`);

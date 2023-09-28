@@ -12,7 +12,7 @@ export class UserService {
 
   // Método para registrar un usuario en el backend
   registrarUsuario(userData: any): Observable<any> {
-    const url = `${this.backendUrl}/createUsuario`; // Reemplaza 'registro' con la ruta correcta de tu API
+    const url = `${this.backendUrl}/createUsuario`; 
     return this.http.post(url, userData);
   }
 }
