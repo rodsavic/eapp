@@ -19,9 +19,13 @@ import { MeaningComponent } from './word/meaning/meaning.component';
 import format from 'date-fns/format';
 import { WordUpdateComponent } from './word/word-update/word-update.component';
 import { TypeComponent } from './type/type.component';
+import { CookieService } from 'ngx-cookie-service';
+import { PhraseCreateComponent } from './word/phrase-create/phrase-create.component';
+import { SentenceComponent } from './sentence/sentence.component';
+import { CreateSenteceComponent } from './sentence/create-sentece/create-sentece.component';
 
 @NgModule({
-  declarations: [AppDashboardComponent, HomeComponent,WordComponent, WordCreateComponent, MeaningComponent, WordUpdateComponent, TypeComponent],
+  declarations: [AppDashboardComponent, HomeComponent,WordComponent, WordCreateComponent, MeaningComponent, WordUpdateComponent, TypeComponent, PhraseCreateComponent, SentenceComponent, CreateSenteceComponent],
   imports: [
     CommonModule,
     MaterialModule,
@@ -33,8 +37,9 @@ import { TypeComponent } from './type/type.component';
     MatDatepickerModule,
     MatNativeDateModule,
     ReactiveFormsModule,
-  
+    
   ],
   exports: [TablerIconsModule],
+  providers: [CookieService],
 })
 export class PagesModule {}

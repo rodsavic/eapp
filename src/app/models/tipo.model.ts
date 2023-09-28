@@ -4,5 +4,5 @@ export class Tipo {
         public codTipo: string,
         public idCategoria: number,
         //public fechaRegistro: Date,
-    ) {}
-  }
+    ) { }
+}

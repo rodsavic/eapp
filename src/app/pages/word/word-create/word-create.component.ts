@@ -17,13 +17,14 @@ import { TypeComponent } from '../../type/type.component';
 })
 export class WordCreateComponent implements OnInit {
 
-  data: DialogData = {
+  /*data: DialogData = {
     contenido: '',
     dificultad: '',
     aprendido: false,
     codTipo: '',
-  };
-
+    idCategoria:1
+  };*/
+  idCategoria = 1;
   significado: {
     descripcion: String,
     idPalabraFrase: Number,
@@ -142,7 +143,8 @@ export class WordCreateComponent implements OnInit {
     const dialogRef = this.dialog.open(TypeComponent, {
       width: '40%',
       height: '40%',
-      data: this.data
+      data:this.idCategoria,
+      //data: this.data
     });
 
     dialogRef.afterClosed().subscribe(result => {

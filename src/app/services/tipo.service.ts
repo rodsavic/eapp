@@ -13,18 +13,18 @@ export class TipoService {
   constructor(private http: HttpClient) { }
 
   // Método para registrar un tipo en el backend
-  registrarTipo(data: any): Observable<any> {
+  registrarTipo(data: Tipo): Observable<any> {
     const url = `${this.backendUrl}/`;
     return this.http.post(url, data);
   }
 
-  // Metodo para actualizar palabra
-  updateTipo(id: number, data: any): Observable<any> {
+  // Metodo para actualizar tipo
+  updateTipo(id: number, data: Tipo): Observable<any> {
     const url = `${this.backendUrl}/${id}`;
     return this.http.put(url, data);
   }
 
-  //Metodo para eliminar palabra
+  //Metodo para eliminar tipo
   eliminarTipo(id: string): Observable<any> {
     const url = `${this.backendUrl}/${id}`;
     return this.http.delete(url);

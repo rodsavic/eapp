@@ -20,12 +20,16 @@ import { WordUpdateComponent } from './word-update/word-update.component';
 import { SignificadoService } from 'src/app/services/significado.service';
 import { TipoService } from 'src/app/services/tipo.service';
 import { Tipo } from 'src/app/models/tipo.model';
+import { PhraseCreateComponent } from './phrase-create/phrase-create.component';
+import { SentenceComponent } from '../sentence/sentence.component';
+import { Word } from 'src/app/models/word.model';
 
 export interface DialogData {
   contenido: string;
   dificultad: string;
   aprendido: boolean;
   codTipo: string;
+  idCategoria: number;
 }
 
 @Component({
@@ -34,21 +38,21 @@ export interface DialogData {
   //styleUrls: ['./word.component.css']
 })
 export class WordComponent implements OnInit {
-  //private backendUrl = 'http://localhost:8081';
 
-  words: any[] = [];
+  words: Word[] = [];
   data: DialogData = {
     contenido: '',
     dificultad: '',
     aprendido: false,
     codTipo: '',
+    idCategoria: 1,
   };
 
   filter: any = {
     word: '',
     level: '',
     learned: '',
-    codTipo:'',
+    codTipo: '',
     startDate: null,
     endDate: null,
   };
@@ -86,7 +90,7 @@ export class WordComponent implements OnInit {
   getInitialWords() {
     this.palabraService.getPalabra().subscribe((words: any[]) => {
       this.words = words;
-      
+
       let requests = words.map(word => {
         return this.tipoService.getTipoByCod(word.codTipo).pipe(
           map((tipo: any) => {
@@ -94,7 +98,7 @@ export class WordComponent implements OnInit {
           })
         );
       });
-      
+
       forkJoin(requests).subscribe((results: any[]) => {
         this.displayedWordsWithTypes = results.slice(0, this.pageSize);
       });
@@ -102,18 +106,18 @@ export class WordComponent implements OnInit {
 
 
   }
-  
+
 
   deleteWord(word: any): void {
     // Obtén el ID de la palabra seleccionada
     const palabraId = word.idPalabraFrase;
-  
+
     this.significadoService.getSignificadosByPalabraId(palabraId)
       .subscribe((significados: any[]) => {
         // Extrae los IDs de significados y almacénalos en un arreglo
         const significadoIds = significados.map(significado => significado.idSignificado);
         console.log("Ids de significados obtenidos:", significadoIds);
-  
+
         // Verifica si hay significados antes de eliminar
         if (significadoIds.length > 0) {
           // Itera sobre los IDs de significados y elimina cada uno
@@ -123,7 +127,7 @@ export class WordComponent implements OnInit {
             });
           }
         }
-  
+
         // Una vez eliminados los significados (o si no había ninguno), elimina la palabra
         this.palabraService.eliminarPalabra(palabraId).subscribe(() => {
           // Actualiza la lista de palabras después de eliminar
@@ -150,6 +154,20 @@ export class WordComponent implements OnInit {
     });
   }
 
+  // Función para abrir el diálogo de creacion de palabra
+  openPhraseCreateDialog(): void {
+    const dialogRef = this.dialog.open(PhraseCreateComponent, {
+      width: '75%',
+      height: '75%',
+      data: this.data
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed', result);
+      this.getInitialWords();
+    });
+  }
+
   // Función para abrir el diálogo de actualización de palabra
   openWordUpdateDialog(word: any): void {
     this.selectedWord = word; // Almacena la palabra seleccionada en la variable
@@ -165,25 +183,40 @@ export class WordComponent implements OnInit {
     });
   }
 
+
+  // Función para abrir el diálogo de oracion
+  openSentenceDialog(idPalabraFrase: number, palabra :string): void {
+    const dialogRef = this.dialog.open(SentenceComponent, {
+      width: '75%',
+      height: '75%',
+      data: { id: idPalabraFrase, palabra: palabra }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed', result);
+      this.getInitialWords();
+    });
+  }
+
   onPageChange($event: any) {
     this.pageSize = $event.pageSize;
-  this.currentPage = $event.pageIndex;
-  const startIndex = this.currentPage * this.pageSize;
-  const paginatedWords = this.words.slice(startIndex, startIndex + this.pageSize);
-  
-  // Crear peticiones para cargar los datos de "Type" para las palabras paginadas
-  let requests = paginatedWords.map(word => {
-    return this.tipoService.getTipoByCod(word.codTipo).pipe(
-      map((tipo: any) => {
-        return { ...word, tipoDescripcion: tipo.descripcion };
-      })
-    );
-  });
+    this.currentPage = $event.pageIndex;
+    const startIndex = this.currentPage * this.pageSize;
+    const paginatedWords = this.words.slice(startIndex, startIndex + this.pageSize);
 
-  // Realizar las peticiones y actualizar displayedWordsWithTypes con los resultados
-  forkJoin(requests).subscribe((results: any[]) => {
-    this.displayedWordsWithTypes = results;
-  });
+    // Crear peticiones para cargar los datos de "Type" para las palabras paginadas
+    let requests = paginatedWords.map(word => {
+      return this.tipoService.getTipoByCod(word.codTipo).pipe(
+        map((tipo: any) => {
+          return { ...word, tipoDescripcion: tipo.descripcion };
+        })
+      );
+    });
+
+    // Realizar las peticiones y actualizar displayedWordsWithTypes con los resultados
+    forkJoin(requests).subscribe((results: any[]) => {
+      this.displayedWordsWithTypes = results;
+    });
   }
 
   loadTipos() {
@@ -193,7 +226,7 @@ export class WordComponent implements OnInit {
     console.log('tipoOptions:', this.tipoOptions);
 
   }
-  
+
   onSubmit() {
     // Realiza la búsqueda con los filtros y actualiza las palabras mostradas
     this.palabraService.filtrarPalabra(this.filter).subscribe((words: any[]) => {
