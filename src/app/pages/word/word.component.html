@@ -1,12 +1,14 @@
 <div class="main-content">
   <mat-card class="cardWithShadow">
     <mat-card-content>
-      <mat-card-title>Words</mat-card-title>
-      <mat-card-subtitle class="mat-body-1"></mat-card-subtitle>
+      <mat-card-title>Words & Phrases</mat-card-title>
     </mat-card-content>
   </mat-card>
   <button (click)="openWordCreateDialog()" mat-flat-button color="primary" class="m-t-8 m-b-8">
     New Word
+  </button>
+  <button (click)="openPhraseCreateDialog()" mat-flat-button color="accent" class="m-t-8 m-b-8 m-l-16">
+    New Phrase
   </button>
   <!--FILTRO-->
   <form (ngSubmit)="onSubmit()">
@@ -89,7 +91,7 @@
         </div>
 
         <button mat-flat-button color="primary" class="m-t-16" type="submit">Apply</button>
-        <button mat-flat-button color="accent" class="m-t-16 m-l-16" type="submit">Clean</button>
+        <button mat-flat-button color="warn" class="m-t-16 m-l-16" type="submit">Clean</button>
 
       </mat-card-content>
     </mat-card>
@@ -114,6 +116,10 @@
 
               <th class="f-w-600 mat-subtitle-1 f-s-14">Date Registered</th>
 
+              <th class="f-w-600 mat-subtitle-1 f-s-14">Sentences</th>
+
+              <th class="f-w-600 mat-subtitle-1 f-s-14">Meanings</th>
+
               <th class="f-w-600 mat-subtitle-1 f-s-14">Action</th>
 
             </tr>
@@ -137,19 +143,33 @@
               <td class="mat-body-1 text-center">{{ word.fechaRegistro | date:'dd-MM-yyyy'}}</td>
 
               <td class="mat-body-1 text-center">
-                <button (click)="openWordUpdateDialog(word)" mat-flat-button color="accent"
-                  class="m-t-8 text-center">Editar
+                <button (click)="openSentenceDialog(word.idPalabraFrase,word.contenido)" mat-icon-button color="primary">
+                  <mat-icon>remove_red_eye</mat-icon>
+                </button>  
+                
+              </td>
+
+              <td class="mat-body-1 text-center">
+                <button mat-icon-button color="primary"><mat-icon>remove_red_eye</mat-icon></button>  
+                
+              </td>
+
+              <td class="mat-body-1 text-center">
+                <button (click)="openWordUpdateDialog(word)" mat-mini-fab color="accent"
+                  class="m-t-8 text-center">
                   <mat-icon aria-hidden="false" aria-label="Edit icon">edit</mat-icon>
 
                 </button>
-                <button (click)="deleteWord(word)" mat-flat-button color="warn"
-                  class="m-t-8 m-l-16 text-center">Eliminar
+                <button (click)="deleteWord(word)" mat-mini-fab color="warn"
+                  class="m-t-8 m-l-16 text-center">
                   <mat-icon aria-hidden="false" aria-label="Delete icon">delete</mat-icon>
 
 
                 </button>
 
               </td>
+
+              
             </tr>
 
           </tbody>

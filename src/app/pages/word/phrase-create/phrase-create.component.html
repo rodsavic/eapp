@@ -1,0 +1,61 @@
+<div class="main-content">
+    <mat-card class="cardWithShadow">
+        <mat-card-title class="mat-title m-t-16 f-s-38 f-w-600 m-b-16 d-block text-center" >New Phrase</mat-card-title>
+        <mat-card-content>
+            
+
+
+
+            <form (ngSubmit)="formSubmit()" [formGroup]="form">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <mat-form-field>
+                            <input matInput formControlName="contenido" name="contenido" placeholder="Phrase">
+                        </mat-form-field>
+                    </div>
+                    <div class="col-lg-6">
+                        <mat-form-field>
+                            <mat-label
+                                class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block text-center">Level</mat-label>
+
+                            <mat-select formControlName="dificultad" name="dificultad">
+                                <mat-option *ngFor="let dificultad of dificultadOptions" [value]="dificultad">
+                                    {{dificultad}}
+                                </mat-option>
+                            </mat-select>
+
+                        </mat-form-field>
+                    </div>
+                    
+
+
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <mat-checkbox formControlName="aprendido" name="aprendido">Learned</mat-checkbox>
+                    </div>
+                    <div class="col-lg-4">
+                        <mat-form-field>
+                        <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block text-center">Type</mat-label>
+
+                        <mat-select formControlName="codTipo" name="codTipo">
+                            <mat-option *ngFor="let tipo of tipoOptions" [value]="tipo.codTipo">
+                              {{ tipo.descripcion }}
+                            </mat-option>
+                          </mat-select>
+                          
+                    </mat-form-field>
+                    <button (click)="openTypeCreateDialog()" type="button" mat-flat-button color="primary" class="m-t-4">
+                        Create new type
+                    </button>
+                    </div>
+                   
+                </div>
+
+                <button mat-flat-button color="primary" class="m-t-16" type="submit">Guardar</button>
+                <button mat-flat-button color="warn" class="m-t-16 m-l-16" type="button"
+                    (click)="cancelar()">Cancelar</button>
+            </form>
+        </mat-card-content>
+    </mat-card>
+</div>
