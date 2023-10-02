@@ -23,9 +23,10 @@ import { CookieService } from 'ngx-cookie-service';
 import { PhraseCreateComponent } from './word/phrase-create/phrase-create.component';
 import { SentenceComponent } from './sentence/sentence.component';
 import { CreateSenteceComponent } from './sentence/create-sentece/create-sentece.component';
+import { UpdateSenteceComponent } from './sentence/update-sentece/update-sentece.component';
 
 @NgModule({
-  declarations: [AppDashboardComponent, HomeComponent,WordComponent, WordCreateComponent, MeaningComponent, WordUpdateComponent, TypeComponent, PhraseCreateComponent, SentenceComponent, CreateSenteceComponent],
+  declarations: [AppDashboardComponent, HomeComponent,WordComponent, WordCreateComponent, MeaningComponent, WordUpdateComponent, TypeComponent, PhraseCreateComponent, SentenceComponent, CreateSenteceComponent, UpdateSenteceComponent],
   imports: [
     CommonModule,
     MaterialModule,

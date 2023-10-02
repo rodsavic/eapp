@@ -11,30 +11,26 @@ import { Credentials } from 'src/app/models/credentials.model';
 })
 
 export class LoginComponent{
-  userData = {
-    username: '',
-    password: ''
-  };
-
   creds: Credentials ={
     username: '',
     password: ''
   };
-
-  errorMessage: string = 'ERROR!!'; // Declarar la propiedad errorMessage
   
   constructor(private snack:MatSnackBar,private authService: AuthService, private router: Router) {}
   
   
   formSubmit() {
-    console.log('Ingresa al formSybmit',this.userData);
-    this.authService.login(this.userData).subscribe(response =>{
+    console.log('Ingresa al formSybmit',this.creds);
+    this.authService.login(this.creds).subscribe(response =>{
       this.router.navigate(['/'])
+    },
+    err => {
+        console.log('Hubo un error de autenticación');
+        this.snack.open('Hubo un error de autenticación', 'Cerrar', {
+          duration: 3000,
+        });
+
     })
-  
-      
-   
-      
   }
 }  
 
