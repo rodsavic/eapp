@@ -31,7 +31,7 @@ export class SentenceService {
   }
 
   //Metodo para eliminar oracion
-  deleteSentece(id: number): Observable<any> {
+  deleteSentence(id: number): Observable<any> {
     const url = `${this.backendUrl}/${id}`;
     return this.http.delete(url);
   }

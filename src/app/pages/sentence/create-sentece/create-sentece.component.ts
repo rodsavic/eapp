@@ -18,12 +18,12 @@ export class CreateSenteceComponent {
   ){}
 
   //Lanza error pero funciona igual
-  oracion: Sentence = new Sentence('',this.data["id"]);
+  oracion: Sentence = new Sentence();
   
  //oracion.texto='';
 
   formSubmit() {
-    this.oracion.idPalabraFrase = this.data;
+    this.oracion.idPalabraFrase = this.data["id"];
     this.sentenceService.setSentence(this.oracion).subscribe(response => {
       console.log('Oracion registrada: ', response);
       this.dialogRef.close(); // Cierra el diálogo cuando se completa la petición
