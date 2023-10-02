@@ -10,62 +10,53 @@ export class AuthService {
   private backendUrl = 'http://localhost:8081';
 
   
-
-  public loginStatusSubjec = new Subject<boolean>();
-
   constructor(private http:HttpClient) { }
 
-  login(creds:Credentials){
-    return this.http.post(`${this.backendUrl}/login`,creds,{ 
-      observe: 'response'
-    }).pipe(map((response:HttpResponse<any>)=>{
+  // Método para iniciar sesión.
+  login(creds: Credentials) {
+    // Realizamos una petición POST al endpoint de login en nuestro backend con las credenciales proporcionadas.
+    return this.http.post(`${this.backendUrl}/login`, creds, {
+      observe: 'response' // Observamos toda la respuesta HTTP, no solo el cuerpo.
+    }).pipe(map((response: HttpResponse<any>) => {
+      // Extraemos el cuerpo y los headers de la respuesta.
       const body = response.body;
       const header = response.headers;
 
+      // Extraemos el token de autorización del header.
       const bearerToken = header.get('Authorization')!;
+      // Limpiamos el token de la palabra 'Bearer '.
       const token = bearerToken.replace('Bearer ', '');
 
-      localStorage.setItem('token',token)
+      // Guardamos el token en localStorage.
+      localStorage.setItem('token', token)
+      // Retornamos el cuerpo de la respuesta.
       return body;
     }))
   }
 
-  
-/*
-  //generamos el token
-  public generateToken(userData:any){
-    console.log('Ingresa a generateToKen - authService')
-    return this.http.post(`${this.backendUrl}/generate-token`,userData);
-  }*/
-  /*
-  public getCurrentUser(){
-    return this.http.get(`${this.backendUrl}/actual-usuario`);
-  }
-  */
-  //iniciamos sesión y establecemos el token en el localStorage
-  public loginUser(token:any){
-    localStorage.setItem('token',token);
-    return true;
-  }
-
-  public isLoggedIn(){
+  // Método para verificar si un usuario está logueado.
+  public isLoggedIn() {
+    // Obtenemos el token de localStorage.
     let tokenStr = localStorage.getItem('token');
-    if(tokenStr == undefined || tokenStr == '' || tokenStr == null){
+    // Si el token no está definido, está vacío o es null, retornamos false, indicando que el usuario no está logueado.
+    if (tokenStr == undefined || tokenStr == '' || tokenStr == null) {
       return false;
-    }else{
+    } else {
+      // De lo contrario, retornamos true, indicando que el usuario está logueado.
       return true;
     }
   }
 
-  //cerranis sesion y eliminamos el token del localStorage
-  public logout(){
+  // Método para cerrar sesión.
+  public logout() {
+    // Eliminamos el token y el usuario de localStorage, cerrando así la sesión.
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     return true;
   }
 
-  //obtenemos el token
-  public getToken(){
+  // Método para obtener el token de localStorage.
+  public getToken() {
     return localStorage.getItem('token');
   }
 
