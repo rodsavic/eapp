@@ -1,10 +1,10 @@
 <div class="main-content w-100">
     <mat-card class="cardWithShadow">
         <mat-card-content>
-            <mat-card-title class="text-center">{{ data.palabra }}</mat-card-title>
+            <mat-card-title class="text-center">{{ data.palabra| uppercase }}</mat-card-title>
         </mat-card-content>
     </mat-card>
-    <button (click)="openSentenceCreateDialog()" mat-flat-button color="primary" class="m-t-8 m-b-8">
+    <button (click)="openSentenceCreateDialog()" mat-flat-button color="primary" class="m-t-8 m-l-16">
         New Sentence
     </button>
 
@@ -37,7 +37,7 @@
                             <td class="mat-body-1 text-center">{{ sentence.fechaRegistro | date:'dd-MM-yyyy'}}</td>
 
                             <td class="mat-body-1 text-center">
-                                <button mat-mini-fab color="accent" class="m-t-8 text-center">
+                                <button (click)="openSentenceUpdateDialog(sentence.idOracion,sentence.texto)" mat-mini-fab color="accent" class="m-t-8 text-center">
                                     <mat-icon aria-hidden="false" aria-label="Edit icon">edit</mat-icon>
 
                                 </button>
@@ -52,6 +52,9 @@
 
                     </tbody>
                 </table>
+
+                <button mat-flat-button color="warn" class="m-t-16 m-l-16" type="button"
+                (click)="cancelar()">Close</button>
                 <!--
         <mat-paginator [length]="words.length" [pageIndex]="pageIndex" [pageSize]="pageSize"
           [pageSizeOptions]="pageSizeOptions" (page)="onPageChange($event)" class="m-t-16">

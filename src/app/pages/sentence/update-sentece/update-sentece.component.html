@@ -1,0 +1,15 @@
+<div class="main-content">
+    <mat-card class="cardWithShadow">
+        <mat-card-title class="mat-title m-t-16 f-s-38 f-w-600 m-b-16 d-block text-center">Edit Sentence</mat-card-title>
+        <mat-card-content>
+            <div class="text-center">
+                <mat-form-field class="w-100">
+                    <input matInput [(ngModel)]="texto" name="texto" placeholder="">
+                </mat-form-field>
+            </div>
+            <button mat-flat-button color="primary" class="m-t-16" type="button">Guardar</button>
+            <button mat-flat-button color="warn" class="m-t-16 m-l-16" type="button"
+                (click)="cancelar()">Cancelar</button>
+        </mat-card-content>
+    </mat-card>
+</div>
