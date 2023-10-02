@@ -4,10 +4,10 @@
       <mat-card-title>Words & Phrases</mat-card-title>
     </mat-card-content>
   </mat-card>
-  <button (click)="openWordCreateDialog()" mat-flat-button color="primary" class="m-t-8 m-b-8">
+  <button (click)="openWordCreateDialog()" mat-flat-button color="primary" class="m-b-8">
     New Word
   </button>
-  <button (click)="openPhraseCreateDialog()" mat-flat-button color="accent" class="m-t-8 m-b-8 m-l-16">
+  <button (click)="openPhraseCreateDialog()" mat-flat-button color="accent" class="m-b-8 m-l-16">
     New Phrase
   </button>
   <!--FILTRO-->
@@ -17,6 +17,19 @@
       <mat-card-subtitle class="mat-body-1 m-t-8 m-l-16">Filter</mat-card-subtitle>
       <mat-card-content class="p-24">
         <div class="row">
+          <div class="col-lg-4">
+            <mat-card>
+              <mat-form-field>
+                <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block text-center">Choose</mat-label>
+
+                <mat-select [(ngModel)]="filter.idCategoria" [ngModelOptions]="{standalone: true}">
+                  <mat-option *ngFor="let categoria of categoriaOptions" [value]="categoria.id">
+                    {{categoria.descripcion}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </mat-card>
+          </div>
           <div class="col-lg-4">
             <mat-card class="b-1 shadow-none">
               <mat-form-field appearance="outline" class="w-100" color="primary">
@@ -39,6 +52,9 @@
               </mat-form-field>
             </mat-card>
           </div>
+
+        </div>
+        <div class="row">
           <div class="col-lg-4">
             <mat-card class="b-1 shadow-none">
               <mat-form-field>
@@ -53,19 +69,19 @@
               </mat-form-field>
             </mat-card>
           </div>
-        </div>
-        <div class="row">
           <div class="col-lg-4">
-            <mat-form-field>
-              <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block text-center">Type</mat-label>
+            <mat-card class="b-1 shadow-none">
+              <mat-form-field>
+                <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block text-center">Type</mat-label>
 
-              <mat-select [(ngModel)]="filter.codTipo" [ngModelOptions]="{standalone: true}">
-                <mat-option *ngFor="let tipo of tipoOptions" [value]="tipo.codTipo">
-                  {{ tipo.descripcion }}
-                </mat-option>
-              </mat-select>
+                <mat-select [(ngModel)]="filter.codTipo" [ngModelOptions]="{standalone: true}">
+                  <mat-option *ngFor="let tipo of tipoOptions" [value]="tipo.codTipo">
+                    {{ tipo.descripcion }}
+                  </mat-option>
+                </mat-select>
 
-            </mat-form-field>
+              </mat-form-field>
+            </mat-card>
           </div>
 
         </div>
@@ -98,15 +114,15 @@
   </form>
   <mat-card class="cardWithShadow m-t-16">
     <mat-card-content class="p-24">
-      <mat-card-title>List of Words</mat-card-title>
+      <mat-card-title></mat-card-title>
       <div class="table-responsive">
         <table class="w-100">
           <thead>
             <tr>
 
-              <th class="f-w-600 mat-subtitle-1 f-s-14">ID</th>
+              <th class="f-w-600 mat-subtitle-1 f-s-14">#</th>
 
-              <th class="f-w-600 mat-subtitle-1 f-s-14">Word</th>
+              <th class="f-w-600 mat-subtitle-1 f-s-14">Word & Phrase</th>
 
               <th class="f-w-600 mat-subtitle-1 f-s-14">Level</th>
 
@@ -117,18 +133,19 @@
               <th class="f-w-600 mat-subtitle-1 f-s-14">Date Registered</th>
 
               <th class="f-w-600 mat-subtitle-1 f-s-14">Sentences</th>
+              <!--
 
               <th class="f-w-600 mat-subtitle-1 f-s-14">Meanings</th>
-
+                -->
               <th class="f-w-600 mat-subtitle-1 f-s-14">Action</th>
 
             </tr>
           </thead>
           <tbody>
 
-            <tr *ngFor="let word of displayedWordsWithTypes">
+            <tr *ngFor="let word of displayedWordsWithTypes; let i = index">
 
-              <td class="mat-body-1 text-center">{{ word.idPalabraFrase }}</td>
+              <td class="mat-body-1 text-center">{{ i + 1 }}</td>
 
               <td class="mat-body-1">{{ word.contenido }}</td>
 
@@ -143,25 +160,24 @@
               <td class="mat-body-1 text-center">{{ word.fechaRegistro | date:'dd-MM-yyyy'}}</td>
 
               <td class="mat-body-1 text-center">
-                <button (click)="openSentenceDialog(word.idPalabraFrase,word.contenido)" mat-icon-button color="primary">
+                <button (click)="openSentenceDialog(word.idPalabraFrase,word.contenido)" mat-icon-button
+                  color="primary">
                   <mat-icon>remove_red_eye</mat-icon>
-                </button>  
-                
-              </td>
+                </button>
 
-              <td class="mat-body-1 text-center">
-                <button mat-icon-button color="primary"><mat-icon>remove_red_eye</mat-icon></button>  
-                
               </td>
-
+              <!--
               <td class="mat-body-1 text-center">
-                <button (click)="openWordUpdateDialog(word)" mat-mini-fab color="accent"
-                  class="m-t-8 text-center">
+                <button mat-icon-button color="primary"><mat-icon>remove_red_eye</mat-icon></button>
+
+              </td>
+              -->
+              <td class="mat-body-1 text-center">
+                <button (click)="openWordUpdateDialog(word)" mat-mini-fab color="accent" class="m-t-8 text-center">
                   <mat-icon aria-hidden="false" aria-label="Edit icon">edit</mat-icon>
 
                 </button>
-                <button (click)="deleteWord(word)" mat-mini-fab color="warn"
-                  class="m-t-8 m-l-16 text-center">
+                <button (click)="deleteWord(word)" mat-mini-fab color="warn" class="m-t-8 m-l-16 text-center">
                   <mat-icon aria-hidden="false" aria-label="Delete icon">delete</mat-icon>
 
 
@@ -169,7 +185,7 @@
 
               </td>
 
-              
+
             </tr>
 
           </tbody>

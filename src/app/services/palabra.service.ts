@@ -60,6 +60,10 @@ export class PalabraService {
       params = params.set('fechaFin', filter.endDate.toISOString());
     }
 
+    if (filter.idCategoria){
+      params = params.set('idCategoria', filter.idCategoria);
+    }
+
     return this.http.get(url, { params });
   }
 

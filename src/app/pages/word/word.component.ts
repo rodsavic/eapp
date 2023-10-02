@@ -23,6 +23,7 @@ import { Tipo } from 'src/app/models/tipo.model';
 import { PhraseCreateComponent } from './phrase-create/phrase-create.component';
 import { SentenceComponent } from '../sentence/sentence.component';
 import { Word } from 'src/app/models/word.model';
+import { SentenceService } from 'src/app/services/sentence.service';
 
 export interface DialogData {
   contenido: string;
@@ -55,12 +56,17 @@ export class WordComponent implements OnInit {
     codTipo: '',
     startDate: null,
     endDate: null,
+    idCategoria: null
   };
 
   tipoOptions: Tipo[];
   displayedWordsWithTypes: any[] = [];
   dificultadOptions: string[] = ['Easy', 'Medium', 'Hard'];
   estadoOptions: string[] = ['Yes', 'No'];
+  categoriaOptions: any[] = [
+  {id: 1, descripcion: 'Palabra'},
+  {id: 2, descripcion: 'Frase'}
+];
   selectedWord: any;
   significadosIds: any;
 
@@ -80,6 +86,7 @@ export class WordComponent implements OnInit {
     private snack: MatSnackBar,
     private significadoService: SignificadoService,
     private tipoService: TipoService,
+    private sentenceService: SentenceService
   ) { }
 
   ngOnInit(): void {
@@ -109,94 +116,79 @@ export class WordComponent implements OnInit {
 
 
   deleteWord(word: any): void {
-    // Obtén el ID de la palabra seleccionada
+    // Obtén el ID de la palabra seleccionada.
     const palabraId = word.idPalabraFrase;
-
-    this.significadoService.getSignificadosByPalabraId(palabraId)
-      .subscribe((significados: any[]) => {
-        // Extrae los IDs de significados y almacénalos en un arreglo
-        const significadoIds = significados.map(significado => significado.idSignificado);
-        console.log("Ids de significados obtenidos:", significadoIds);
-
-        // Verifica si hay significados antes de eliminar
-        if (significadoIds.length > 0) {
-          // Itera sobre los IDs de significados y elimina cada uno
-          for (const id of significadoIds) {
-            this.significadoService.eliminarSignificado(id).subscribe(() => {
-              console.log("Significado eliminado correctamente");
-            });
-          }
-        }
-
-        // Una vez eliminados los significados (o si no había ninguno), elimina la palabra
-        this.palabraService.eliminarPalabra(palabraId).subscribe(() => {
-          // Actualiza la lista de palabras después de eliminar
-          this.getInitialWords();
-          // O muestra un mensaje de éxito
-          this.snack.open('Palabra eliminada correctamente', 'Cerrar', {
-            duration: 3000,
-          });
-        });
+    
+    // Definición de la función para eliminar significados.
+    const deleteSignificados = () => {
+      // Se retorna una nueva Promesa.
+      return new Promise<void>((resolve, reject) => {
+        // Obtén todos los significados asociados a la palabra.
+        this.significadoService.getSignificadosByPalabraId(palabraId)
+          .subscribe((significados: any[]) => {
+            // Si no hay significados asociados, resuelve la Promesa inmediatamente.
+            if (significados.length === 0) return resolve();
+            
+            // Inicializa el contador de significados eliminados.
+            let deletedCount = 0;
+            // Itera sobre cada significado obtenido.
+            for (const significado of significados) {
+              // Elimina cada significado individualmente.
+              this.significadoService.eliminarSignificado(significado.idSignificado)
+                .subscribe(() => {
+                  // Si todos los significados han sido eliminados, resuelve la Promesa.
+                  if (++deletedCount === significados.length) resolve();
+                }, reject); // Si ocurre un error al eliminar, rechaza la Promesa.
+            }
+          }, reject); // Si ocurre un error al obtener los significados, rechaza la Promesa.
       });
-  }
-
-  // Función para abrir el diálogo de creacion de palabra
-  openWordCreateDialog(): void {
-    const dialogRef = this.dialog.open(WordCreateComponent, {
-      width: '75%',
-      height: '75%',
-      data: this.data
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed', result);
-      this.getInitialWords();
-    });
-  }
-
-  // Función para abrir el diálogo de creacion de palabra
-  openPhraseCreateDialog(): void {
-    const dialogRef = this.dialog.open(PhraseCreateComponent, {
-      width: '75%',
-      height: '75%',
-      data: this.data
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed', result);
-      this.getInitialWords();
-    });
-  }
-
-  // Función para abrir el diálogo de actualización de palabra
-  openWordUpdateDialog(word: any): void {
-    this.selectedWord = word; // Almacena la palabra seleccionada en la variable
-    const dialogRef = this.dialog.open(WordUpdateComponent, {
-      width: '75%',
-      height: '75%',
-      data: this.selectedWord // Pasa la palabra seleccionada al diálogo
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('Edit dialog was closed', result);
-      this.getInitialWords();
-    });
-  }
-
-
-  // Función para abrir el diálogo de oracion
-  openSentenceDialog(idPalabraFrase: number, palabra :string): void {
-    const dialogRef = this.dialog.open(SentenceComponent, {
-      width: '75%',
-      height: '75%',
-      data: { id: idPalabraFrase, palabra: palabra }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed', result);
-      this.getInitialWords();
+    }
+    
+    // Definición de la función para eliminar oraciones.
+    const deleteOraciones = () => {
+      // Se retorna una nueva Promesa.
+      return new Promise<void>((resolve, reject) => {
+        // Obtén todas las oraciones asociadas a la palabra.
+        this.sentenceService.getSentence(palabraId)
+          .subscribe((oraciones: any[]) => {
+            // Si no hay oraciones asociadas, resuelve la Promesa inmediatamente.
+            if (oraciones.length === 0) return resolve();
+            
+            // Inicializa el contador de oraciones eliminadas.
+            let deletedCount = 0;
+            // Itera sobre cada oración obtenida.
+            for (const oracion of oraciones) {
+              // Elimina cada oración individualmente.
+              this.sentenceService.deleteSentence(oracion.idOracion)
+                .subscribe(() => {
+                  // Si todas las oraciones han sido eliminadas, resuelve la Promesa.
+                  if (++deletedCount === oraciones.length) resolve();
+                }, reject); // Si ocurre un error al eliminar, rechaza la Promesa.
+            }
+          }, reject); // Si ocurre un error al obtener las oraciones, rechaza la Promesa.
+      });
+    }
+    
+    // Definición de la función para eliminar la palabra.
+    const deletePalabra = () => {
+      // Elimina la palabra.
+      this.palabraService.eliminarPalabra(palabraId)
+        .subscribe(() => {
+          // Refresca la lista de palabras y muestra un mensaje de éxito.
+          this.getInitialWords();
+          this.snack.open('Palabra eliminada correctamente', 'Cerrar', { duration: 3000, });
+        });
+    }
+    
+    // Ejecución secuencial de las funciones de eliminación.
+    // Primero elimina significados, luego oraciones y finalmente la palabra.
+    // Si ocurre algún error en el proceso, se registra en la consola del navegador.
+    deleteSignificados().then(deleteOraciones).then(deletePalabra).catch(err => {
+      console.error('Error eliminando palabra:', err);
     });
   }
+  
+  
 
   onPageChange($event: any) {
     this.pageSize = $event.pageSize;
@@ -235,6 +227,66 @@ export class WordComponent implements OnInit {
       this.currentPage = 0;
       // Muestra las palabras filtradas en la página actual
       this.displayedWordsWithTypes = this.words.slice(0, this.pageSize);
+    });
+  }
+
+  // Función para abrir el diálogo de creacion de palabra
+  openWordCreateDialog(): void {
+    const dialogRef = this.dialog.open(WordCreateComponent, {
+      width: '75%',
+      height: '75%',
+      data: this.data
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed', result);
+      this.getInitialWords();
+    });
+  }
+
+
+  //SECCION DE DIALOGOS
+  // Función para abrir el diálogo de creacion de palabra
+  openPhraseCreateDialog(): void {
+    const dialogRef = this.dialog.open(PhraseCreateComponent, {
+      width: '75%',
+      height: '75%',
+      data: this.data
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed', result);
+      this.getInitialWords();
+    });
+  }
+
+  // Función para abrir el diálogo de actualización de palabra
+  openWordUpdateDialog(word: any): void {
+    this.selectedWord = word; // Almacena la palabra seleccionada en la variable
+    const dialogRef = this.dialog.open(WordUpdateComponent, {
+      width: '75%',
+      height: '75%',
+      data: this.selectedWord // Pasa la palabra seleccionada al diálogo
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('Edit dialog was closed', result);
+      this.getInitialWords();
+    });
+  }
+
+
+  // Función para abrir el diálogo de oracion
+  openSentenceDialog(idPalabraFrase: number, palabra: string): void {
+    const dialogRef = this.dialog.open(SentenceComponent, {
+      width: '75%',
+      height: '75%',
+      data: { id: idPalabraFrase, palabra: palabra }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed', result);
+      this.getInitialWords();
     });
   }
 }
